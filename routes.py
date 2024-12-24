@@ -57,3 +57,11 @@ def edit_review(review_id):
     
     return jsonify(edited_review), 200
 
+
+@routes_blueprint.route('/reviews/<int:review_id>', methods=['DELETE'])
+def delete_review(review_id):
+    review = Review.query.get_or_404(review_id)
+    db.session.delete(review)
+    db.session.commit()
+
+    return jsonify({'message': f'Review with ID {review_id} has been deleted successfully.'}), 200
