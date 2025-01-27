@@ -1,5 +1,5 @@
 # SPM Api
-This is the Rest Api I use for the Reviews in the SPM app. Note that this api has a landing page. However, to show that this is a Python Flask Api I left the HTML, CSS, and JavaScript out of the language stats calculation by using a .gitattributes file.
+This is the Rest Api I use for the Reviews in the SPM app. This API has a landing page, but I excluded the HTML, CSS, and JavaScript from the language stats by using a .gitattributes file to make it clear that it's a Python Flask API.
 
 ## How to Setup This Project
 
