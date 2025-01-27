@@ -1,8 +1,18 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, render_template, request, jsonify
 from models import Review
 from db import db
 
 routes_blueprint = Blueprint('routes', __name__)
+
+@routes_blueprint.route('/')
+def serve_homepage():
+    return render_template('index.html')
+
+
+@routes_blueprint.route('/endpoints')
+def serve_endpoints():
+    return render_template('endpoints.html')
+
 
 @routes_blueprint.route('/reviews', methods=['GET'])
 def get_all_reviews():
@@ -15,6 +25,21 @@ def get_all_reviews():
                     'editable': r.editable} for r in reviews]
     
     return jsonify(all_reviews), 200
+
+@routes_blueprint.route('/reviews/<int:review_id>', methods=['GET'])
+def get_review_by_id(review_id):
+    review = Review.query.get_or_404(review_id)
+
+    review_data = {
+        'id': review.id,
+        'name': review.name,
+        'stars': review.stars,
+        'text_review': review.text_review,
+        'editable': review.editable
+    }
+
+    return jsonify(review_data), 200
+
 
 @routes_blueprint.route('/reviews', methods=['POST'])
 def add_review():
@@ -31,6 +56,7 @@ def add_review():
     }
 
     return jsonify(new_review), 201
+
 
 @routes_blueprint.route('/reviews/<int:review_id>', methods=['PUT'])
 def edit_review(review_id):

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews REST API</title>
+    <link rel="stylesheet" href="/static/styles.css?v=1.0.0">
+    <script src="https://unpkg.com/petite-vue"></script>
+</head>
+<body>
+<div v-scope="{
+    review: { name: 'John Doe', stars: 5, text_review: 'Great product!', editable: true },
+    copyText
+}" class="container">
+
+    <h1 class="section-title">Reviews REST API</h1>
+
+    <div class="links">
+        <a href="/endpoints" class="link" target="_blank">Use these Endpoints</a>
+        <a href="https://github.com/MichaelT-178/SPM-Rest-Api" class="link" target="_blank">Github Repo</a>
+        <a href="https://github.com/MichaelT-178/SPM-Rest-Api" class="link" target="_blank">Shaky Pale iOS app</a>
+    </div>
+
+    <!-- API Endpoints -->
+    <h2 class="section-title">API Endpoints</h2>
+    <ul>
+        <li><strong>GET</strong> /reviews</li>
+        <li><strong>GET</strong> /reviews/&lt;int:review_id&gt;</li>
+        <li><strong>POST</strong> /reviews</li>
+        <li><strong>PUT</strong> /reviews/&lt;int:review_id&gt;</li>
+        <li><strong>DELETE</strong> /reviews/&lt;int:review_id&gt;</li>
+    </ul>
+
+    <!-- GET Request -->
+    <h2 class="section-title">GET /reviews</h2>
+    <p>Retrieve a list of all reviews.</p>
+    <div class="code-block">
+        <pre><code>GET /reviews
+Response:
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "stars": 5,
+        "text_review": "Great product!",
+        "editable": true
+    },
+    ...
+]</code></pre>
+    </div>
+
+    <!-- GET Request by ID -->
+    <h2 class="section-title">GET /reviews/&lt;int:review_id&gt;</h2>
+    <p>Retrieve a review by ID.</p>
+    <div class="code-block">
+        <pre><code>GET /reviews/&lt;int:review_id&gt;
+Response:
+{
+    "id": 1,
+    "name": "John Doe",
+    "stars": 5,
+    "text_review": "Great product!",
+    "editable": true
+}</code></pre>
+    </div>
+
+    <!-- POST Request -->
+    <h2 class="section-title">POST /reviews</h2>
+    <p>Create a new review. Use the following fields:</p>
+    <ul>
+        <li><strong>name</strong> (string): Name of the reviewer.</li>
+        <li><strong>stars</strong> (integer): Star rating (1-5).</li>
+        <li><strong>text_review</strong> (string): Text content of the review.</li>
+        <li><strong>editable</strong> (boolean): Whether the review can be edited (default: true).</li>
+    </ul>
+    <div class="code-block">
+        <pre><code>{% raw %}POST /reviews
+Request Body:
+{
+    "name": "{{ review.name }}",
+    "stars": {{ review.stars }},
+    "text_review": "{{ review.text_review }}",
+    "editable": {{ review.editable }}
+}
+Response:
+{
+    "name": "John Doe",
+    "stars": 5,
+    "text_review": "Great product!",
+    "editable": true
+}{% endraw %}</code></pre>
+    </div>
+
+    <!-- PUT Request -->
+    <h2 class="section-title">PUT /reviews/&lt;int:review_id&gt;</h2>
+    <p>Update an existing review by ID. Use the following fields:</p>
+    <ul>
+        <li><strong>name</strong> (string): Name of the reviewer (optional).</li>
+        <li><strong>stars</strong> (integer): Star rating (1-5) (optional).</li>
+        <li><strong>text_review</strong> (string): Text content of the review (optional).</li>
+        <li><strong>editable</strong> (boolean): Whether the review can be edited (optional).</li>
+    </ul>
+    <div class="code-block">
+        <pre><code>{% raw %}PUT /reviews/&lt;int:review_id&gt;
+Request Body:
+{
+    "name": "{{ review.name }}",
+    "stars": {{ review.stars }},
+    "text_review": "{{ review.text_review }}",
+    "editable": {{ review.editable }}
+}
+Response:
+{
+    "name": "John Doe",
+    "stars": 4,
+    "text_review": "Updated review text.",
+    "editable": false
+}{% endraw %}</code></pre>
+    </div>
+
+    <!-- DELETE Request -->
+    <h2 class="section-title">DELETE /reviews/&lt;int:review_id&gt;</h2>
+    <p>Delete an existing review by ID.</p>
+    <div class="code-block">
+        <pre><code>{% raw %}DELETE /reviews/&lt;int:review_id&gt;
+Response:
+{
+    "message": "Review with ID 1 has been deleted successfully."
+}{% endraw %}</code></pre>
+    </div>
+
+</div>
+
+<script>
+const copyText = (event, text) => {
+    navigator.clipboard.writeText(text).then(() => {
+        const button = event.target;
+        button.style.backgroundColor = '#007bff';
+        button.style.color = '#ffffff';
+        button.textContent = 'Copied!';
+
+        setTimeout(() => {
+            button.style.backgroundColor = '#ffffff';
+            button.style.color = '#007bff';
+            button.textContent = 'Copy';
+        }, 1500);
+    });
+}
+
+PetiteVue.createApp({
+    review: { name: 'John Doe', stars: 5, text_review: 'Great product!', editable: true },
+    copyText
+}).mount();
+</script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews REST API</title>
+    <link rel="stylesheet" href="/static/styles.css?v=1.0.0">
+</head>
+<body>
+<div id="app" class="container">
+
+    <h1 class="section-title">Reviews REST API</h1>
+
+    <div class="links">
+        <button class="endpoint-btn" data-section="all-reviews">Get All Reviews</button>
+        <button class="endpoint-btn" data-section="get-review">Get Review</button>
+        <button class="endpoint-btn" data-section="create-review">Create Review</button>
+        <button class="endpoint-btn" data-section="modify-review">Modify Review</button>
+        <button class="endpoint-btn" data-section="docs">Go Back to Docs</button>
+    </div>
+
+    <div id="content" class="content">
+        <!-- Dynamic content will be displayed here -->
+    </div>
+
+</div>
+
+<script>
+    // Reference to the content area
+    const contentDiv = document.getElementById('content');
+
+    // Event listener for button clicks
+    document.querySelectorAll('.endpoint-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+            const section = button.getAttribute('data-section');
+
+            switch (section) {
+                case 'all-reviews':
+                    contentDiv.innerHTML = '<h2 class="section-title">ALL REVIEWS</h2><p>Loading...</p>';
+                    
+                    try {
+                        const response = await fetch('/reviews');
+                        if (!response.ok) {
+                            throw new Error(`Error: ${response.statusText}`);
+                        }
+                        const reviews = await response.json();
+
+                        contentDiv.innerHTML = 
+                            `<h2 class="section-title">ALL REVIEWS</h2>
+                            <ul class="review-list">
+                                ${reviews.map(review => 
+                                    `<li class="review-item">
+                                        <strong>${review.name}</strong> (${review.stars} stars)
+                                        <p>${review.text_review}</p>
+                                        ${review.editable ? '<em>Editable</em>' : ''}
+                                    </li>`
+                                ).join('')}
+                            </ul>`;
+                    } catch (error) {
+                        contentDiv.innerHTML = `<p class="error">Failed to load reviews: ${error.message}</p>`;
+                    }
+                    break;
+
+                case 'get-review':
+                    contentDiv.innerHTML = `
+                        <h2 class="section-title">GET REVIEW</h2>
+                        <div class="form-group">
+                            <label for="review-id">Enter Review ID:</label>
+                            <input type="number" id="review-id" class="input-field" placeholder="Enter ID" min="1">
+                            <button id="fetch-review" class="fetch-btn">Fetch Review</button>
+                        </div>
+                        <br>
+                        <div id="review-result"></div>
+                    `;
+
+                    document.getElementById('fetch-review').addEventListener('click', async () => {
+                        const reviewId = document.getElementById('review-id').value;
+                        const resultDiv = document.getElementById('review-result');
+
+                        if (!reviewId) {
+                            resultDiv.innerHTML = '<p class="error">Please enter a valid Review ID.</p>';
+                            return;
+                        }
+
+                        resultDiv.innerHTML = '<p>Loading...</p>';
+
+                        try {
+                            const response = await fetch(`/reviews/${reviewId}`);
+                            if (!response.ok) {
+                                throw new Error(`Error: ${response.statusText}`);
+                            }
+                            const review = await response.json();
+
+                            resultDiv.innerHTML = `
+                                <div class="review-details">
+                                    <strong>${review.name}</strong> (${review.stars} stars)
+                                    <p>${review.text_review}</p>
+                                    ${review.editable ? '<em>Editable</em>' : ''}
+                                </div>
+                            `;
+                        } catch (error) {
+                            resultDiv.innerHTML = `<p class="error">Failed to fetch review: ${error.message}</p>`;
+                        }
+                    });
+                    break;
+
+                case 'create-review':
+                    contentDiv.innerHTML = '<h2 class="section-title">CREATE REVIEW</h2>';
+                    break;
+
+                case 'modify-review':
+                    contentDiv.innerHTML = '<h2 class="section-title">MODIFY REVIEW</h2>';
+                    break;
+
+                case 'docs':
+                    contentDiv.innerHTML = '<h2 class="section-title">GO BACK TO DOCS</h2>';
+                    break;
+
+                default:
+                    contentDiv.innerHTML = '';
+                    break;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
