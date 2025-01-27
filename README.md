@@ -1,5 +1,5 @@
-# SP Api
-This is the Rest Api I use for the Reviews in the SP app.
+# SPM Api
+This is the Rest Api I use for the Reviews in the SPM app.
 
 ## How to Setup This Project
 
