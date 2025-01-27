@@ -15,7 +15,7 @@
         <button class="endpoint-btn" data-section="all-reviews">Get All Reviews</button>
         <button class="endpoint-btn" data-section="get-review">Get Review</button>
         <button class="endpoint-btn" data-section="create-review">Create Review</button>
-        <button class="endpoint-btn" data-section="Modify-review">Modify Review</button>
+        <button class="endpoint-btn" data-section="modify-review">Modify Review</button>
         <button class="endpoint-btn" data-section="delete-review">Delete Review</button>
         <button class="endpoint-btn" data-section="docs">Go Back to Docs</button>
     </div>
@@ -150,6 +150,96 @@
                             `;
                         } catch (error) {
                             resultDiv.innerHTML = `<p class="error">Failed to create review: ${error.message}</p>`;
+                        }
+                    });
+                    break;
+
+                case 'modify-review':
+                    contentDiv.innerHTML = `
+                        <h2 class="section-title">MODIFY REVIEW</h2>
+                        <div class="form-group">
+                            <label for="modify-review-id">Enter Review ID:</label>
+                            <input type="number" id="modify-review-id" class="input-field" placeholder="Enter ID" min="1">
+                            <button id="fetch-review-to-modify" class="fetch-btn">Fetch Review</button>
+                        </div>
+                        <div id="modify-review-result"></div>
+                    `;
+                    document.getElementById('fetch-review-to-modify').addEventListener('click', async () => {
+                        const reviewId = document.getElementById('modify-review-id').value;
+                        const resultDiv = document.getElementById('modify-review-result');
+                        if (!reviewId) {
+                            resultDiv.innerHTML = '<p class="error">Please enter a valid Review ID.</p>';
+                            return;
+                        }
+                        resultDiv.innerHTML = '<p>Loading...</p>';
+                        try {
+                            const response = await fetch(`/reviews/${reviewId}`);
+                            if (!response.ok) {
+                                throw new Error(`Error: ${response.statusText}`);
+                            }
+                            const review = await response.json();
+                            resultDiv.innerHTML = `
+                                <h3 class="section-title">Edit Review</h3>
+                                <div class="inputs">
+                                    <label>
+                                        Name:
+                                        <input type="text" id="modify-name" class="input-field" value="${review.name}">
+                                    </label>
+                                    <label>
+                                        Stars:
+                                        <input type="number" id="modify-stars" class="input-field" value="${review.stars}" min="1" max="5">
+                                    </label>
+                                    <label>
+                                        Review:
+                                        <input type="text" id="modify-text-review" class="input-field" value="${review.text_review}">
+                                    </label>
+                                    <button id="submit-modify" class="endpoint-btn">Submit Review</button>
+                                </div>
+                                <div id="modify-submit-result"></div>
+                            `;
+
+                            document.getElementById('modify-name').addEventListener('input', (e) => {
+                                review.name = e.target.value;
+                            });
+                            document.getElementById('modify-stars').addEventListener('input', (e) => {
+                                review.stars = parseInt(e.target.value, 10);
+                            });
+                            document.getElementById('modify-text-review').addEventListener('input', (e) => {
+                                review.text_review = e.target.value;
+                            });
+
+                            review.editable = true
+
+                            document.getElementById('submit-modify').addEventListener('click', async () => {
+                                const resultDiv = document.getElementById('modify-submit-result');
+                                try {
+                                    const response = await fetch(`/reviews/${reviewId}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            name: review.name,
+                                            stars: review.stars,
+                                            text_review: review.text_review,
+                                            editable: review.editable
+                                        })
+                                    });
+                                    if (!response.ok) {
+                                        throw new Error(`Error: ${response.statusText}`);
+                                    }
+                                    const updatedReview = await response.json();
+                                    resultDiv.innerHTML = `
+                                        <p class="success">Review updated successfully!</p>
+                                        <div class="review-details">
+                                            <strong>${updatedReview.name}</strong> (${updatedReview.stars} stars)
+                                            <p>${updatedReview.text_review}</p>
+                                        </div>
+                                    `;
+                                } catch (error) {
+                                    resultDiv.innerHTML = `<p class="error">Failed to update review: ${error.message}</p>`;
+                                }
+                            });
+                        } catch (error) {
+                            resultDiv.innerHTML = `<p class="error">Failed to fetch review: ${error.message}</p>`;
                         }
                     });
                     break;
