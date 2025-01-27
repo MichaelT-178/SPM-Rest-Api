@@ -52,7 +52,7 @@ http://127.0.0.1:5000
 ```
 
 ## How to Call this Api
-### You can ping these endpoints by using [Postman](https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode), Thunder Client, cURL, or the UI.
+#### You can ping these endpoints by using [Postman](https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode), Thunder Client, cURL, or the UI.
 
 Get All Reviews
 ```
