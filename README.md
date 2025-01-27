@@ -1,5 +1,5 @@
 # SPM Api
-This is the Rest Api I use for the Reviews in the SPM app. This API has a landing page, but I excluded the HTML, CSS, and JavaScript from the language stats by using a .gitattributes file to make it clear that it's a Python Flask API.
+This is the REST API used for managing reviews in the SPM iOS app. This API has a landing page, but I excluded the HTML, CSS, and JavaScript from the language stats (by using a .gitattributes file) just to make it clear that it's a Python Flask API.
 
 ## How to Setup This Project
 
