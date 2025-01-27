@@ -1,5 +1,5 @@
 # SPM Api
-This is the Rest Api I use for the Reviews in the SPM app.
+This is the Rest Api I use for the Reviews in the SPM app. Note that this api has a landing page. I just left the html, css, and js out of the stats using a .gitattributes file to show this is a Python Flask api.
 
 ## How to Setup This Project
 
