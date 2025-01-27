@@ -15,7 +15,8 @@
         <button class="endpoint-btn" data-section="all-reviews">Get All Reviews</button>
         <button class="endpoint-btn" data-section="get-review">Get Review</button>
         <button class="endpoint-btn" data-section="create-review">Create Review</button>
-        <button class="endpoint-btn" data-section="modify-review">Modify Review</button>
+        <button class="endpoint-btn" data-section="Modify-review">Modify Review</button>
+        <button class="endpoint-btn" data-section="delete-review">Delete Review</button>
         <button class="endpoint-btn" data-section="docs">Go Back to Docs</button>
     </div>
 
@@ -37,22 +38,22 @@
             switch (section) {
                 case 'all-reviews':
                     contentDiv.innerHTML = '<h2 class="section-title">ALL REVIEWS</h2><p>Loading...</p>';
-                    
                     try {
                         const response = await fetch('/reviews');
                         if (!response.ok) {
                             throw new Error(`Error: ${response.statusText}`);
                         }
                         const reviews = await response.json();
-
-                        contentDiv.innerHTML = 
-                            `<h2 class="section-title">ALL REVIEWS</h2>
+                        contentDiv.innerHTML = `
+                            <h2 class="section-title">ALL REVIEWS</h2>
                             <ul class="review-list">
                                 ${reviews.map(review => 
                                     `<li class="review-item">
                                         <strong>${review.name}</strong> (${review.stars} stars)
+                                        <br>
+                                        <br>
+                                        <span>ID: ${review.id}</span>
                                         <p>${review.text_review}</p>
-                                        ${review.editable ? '<em>Editable</em>' : ''}
                                     </li>`
                                 ).join('')}
                             </ul>`;
@@ -72,30 +73,24 @@
                         <br>
                         <div id="review-result"></div>
                     `;
-
                     document.getElementById('fetch-review').addEventListener('click', async () => {
                         const reviewId = document.getElementById('review-id').value;
                         const resultDiv = document.getElementById('review-result');
-
                         if (!reviewId) {
                             resultDiv.innerHTML = '<p class="error">Please enter a valid Review ID.</p>';
                             return;
                         }
-
                         resultDiv.innerHTML = '<p>Loading...</p>';
-
                         try {
                             const response = await fetch(`/reviews/${reviewId}`);
                             if (!response.ok) {
                                 throw new Error(`Error: ${response.statusText}`);
                             }
                             const review = await response.json();
-
                             resultDiv.innerHTML = `
                                 <div class="review-details">
                                     <strong>${review.name}</strong> (${review.stars} stars)
                                     <p>${review.text_review}</p>
-                                    ${review.editable ? '<em>Editable</em>' : ''}
                                 </div>
                             `;
                         } catch (error) {
@@ -105,15 +100,114 @@
                     break;
 
                 case 'create-review':
-                    contentDiv.innerHTML = '<h2 class="section-title">CREATE REVIEW</h2>';
+                    contentDiv.innerHTML = `
+                        <h2 class="section-title">CREATE REVIEW</h2>
+                        <div class="mutation-block">
+                            <h3>Submit a New Review</h3>
+                            <div class="inputs">
+                                <label>
+                                    Name:
+                                    <input type="text" id="review-name" class="input-field" placeholder="Enter your name">
+                                </label>
+                                <label>
+                                    Stars:
+                                    <input type="number" id="review-stars" class="input-field" placeholder="Rate out of 5" min="1" max="5">
+                                </label>
+                                <label>
+                                    Review:
+                                    <input type="text" id="review-text" class="input-field" placeholder="Write your review">
+                                </label>
+                                <button id="submit-review" class="endpoint-btn">Submit Review</button>
+                            </div>
+                            <div id="submit-result"></div>
+                        </div>
+                    `;
+                    document.getElementById('submit-review').addEventListener('click', async () => {
+                        const name = document.getElementById('review-name').value;
+                        const stars = document.getElementById('review-stars').value;
+                        const textReview = document.getElementById('review-text').value;
+                        const resultDiv = document.getElementById('submit-result');
+                        if (!name || !stars || !textReview) {
+                            resultDiv.innerHTML = '<p class="error">All fields are required!</p>';
+                            return;
+                        }
+                        try {
+                            const response = await fetch('/reviews', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name, stars: parseInt(stars, 10), text_review: textReview })
+                            });
+                            if (!response.ok) {
+                                throw new Error(`Error: ${response.statusText}`);
+                            }
+                            const newReview = await response.json();
+                            resultDiv.innerHTML = `
+                                <p class="success">Review created successfully!</p>
+                                <div class="review-details">
+                                    <strong>${newReview.name}</strong> (${newReview.stars} stars)
+                                    <p>${newReview.text_review}</p>
+                                </div>
+                            `;
+                        } catch (error) {
+                            resultDiv.innerHTML = `<p class="error">Failed to create review: ${error.message}</p>`;
+                        }
+                    });
                     break;
 
-                case 'modify-review':
-                    contentDiv.innerHTML = '<h2 class="section-title">MODIFY REVIEW</h2>';
+                case 'delete-review':
+                    contentDiv.innerHTML = `
+                        <h2 class="section-title">DELETE REVIEW</h2>
+                        <div class="form-group">
+                            <label for="delete-review-id">Enter Review ID:</label>
+                            <input type="number" id="delete-review-id" class="input-field" placeholder="Enter ID" min="1">
+                            <button id="fetch-review-to-delete" class="fetch-btn">Fetch Review</button>
+                        </div>
+                        <div id="delete-review-result"></div>
+                    `;
+                    document.getElementById('fetch-review-to-delete').addEventListener('click', async () => {
+                        const reviewId = document.getElementById('delete-review-id').value;
+                        const resultDiv = document.getElementById('delete-review-result');
+                        if (!reviewId) {
+                            resultDiv.innerHTML = '<p class="error">Please enter a valid Review ID.</p>';
+                            return;
+                        }
+                        resultDiv.innerHTML = '<p>Loading...</p>';
+                        try {
+                            const response = await fetch(`/reviews/${reviewId}`);
+                            if (!response.ok) {
+                                throw new Error(`Error: ${response.statusText}`);
+                            }
+                            const review = await response.json();
+                            resultDiv.innerHTML = `
+                                <div class="review-details">
+                                    <br>
+                                    <h2 class="section-title">FETCHED REVIEW<h2>
+                                    <strong>${review.name}</strong> (${review.stars} stars)
+                                    <p>${review.text_review}</p>
+                                </div>
+                                <button id="confirm-delete" class="endpoint-btn">Delete Review</button>
+                            `;
+                            document.getElementById('confirm-delete').addEventListener('click', async () => {
+                                try {
+                                    const deleteResponse = await fetch(`/reviews/${reviewId}`, {
+                                        method: 'DELETE'
+                                    });
+                                    if (!deleteResponse.ok) {
+                                        throw new Error(`Error: ${deleteResponse.statusText}`);
+                                    }
+                                    resultDiv.innerHTML = `<p class="success">Review with ID ${reviewId} deleted successfully!</p>`;
+                                } catch (error) {
+                                    resultDiv.innerHTML = `<p class="error">Failed to delete review: ${error.message}</p>`;
+                                }
+                            });
+                        } catch (error) {
+                            resultDiv.innerHTML = `<p class="error">Failed to fetch review: ${error.message}</p>`;
+                        }
+                    });
                     break;
 
                 case 'docs':
-                    contentDiv.innerHTML = '<h2 class="section-title">GO BACK TO DOCS</h2>';
+                    window.location = '/';
                     break;
 
                 default:
@@ -123,6 +217,5 @@
         });
     });
 </script>
-
 </body>
 </html>
